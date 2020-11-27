@@ -57,7 +57,6 @@ def won():
 # Function for clicking buttons
 def onClick(b, number):
 	global count, answer_list, answer_dict, clicked, matched, buttonlist
-	print(b,number)
 	if buttonlist[number] not in answer_list and count < 2:
 		buttonlist[number].config(bg = colours[number], state = 'disabled')
 		# Add number to answer list
