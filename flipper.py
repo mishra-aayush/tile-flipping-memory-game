@@ -8,23 +8,27 @@ master.title('Image Processor')
 master.maxsize(1600, 900)
 master.config(bg="black")
 
-global matched, clicked, best, tiles, answer_list, answer_dict, count, colours, buttonlist
+global matched, clicked, best, temp_list, temp_dict, colours, buttonlist
 best = -1
 
 # Reset the Game
 def reset():
-	global matched, clicked, best, answer_list, answer_dict, count, colours, buttonlist
+	global matched, clicked, best, temp_list, temp_dict, colours, buttonlist
 	# Define some variables
-	count = 0
+	# Matched to confirm how many pairs have been matched
 	matched = 0
+	# Clicked to ckeck the number of attempts by the user
 	clicked = 0
-	answer_list = []
-	answer_dict = {}
+	# To store the temporary button numbers clicked by the user
+	temp_list = []
+	# To store the button and corresponding colour
+	temp_dict = {}
 
 	# Creating and shuffling our colours
 	colours=['#cbcf62', '#90733f', '#4EAB21', '#39CCCC', '#001f3f', '#FF851B','#85144b', '#FFDC00', '#111111', '#610000', '#3b60f9', '#e15733']*2
 	random.shuffle(colours)
 
+	# Initializing the button list
 	buttonlist = []
 	for i in range(24):
 		button_to_append = Button(bottom_frame, bg='white', height=10, width=20)
@@ -33,7 +37,7 @@ def reset():
 		button_to_append.grid(row=i//8, column=i%8, padx=5, pady=5)
 		buttonlist.append(button_to_append)
 	
-	# Initialize best score and default score
+	# Initializing best score and default score
 	f = open('best.txt', 'r')
 	best = int(f.readline().strip())
 	if best <= -1:
@@ -45,7 +49,7 @@ def reset():
 
 # Create won function
 def won():
-	global matched, clicked, best, answer_list, answer_dict, count, colours
+	global clicked, best
 	# Updating scores
 	if clicked < best or best == -1:
 		best = clicked
@@ -56,24 +60,22 @@ def won():
 
 # Function for clicking buttons
 def onClick(b, number):
-	global count, answer_list, answer_dict, clicked, matched, buttonlist
-	if buttonlist[number] not in answer_list and count < 2:
+	global temp_list, temp_dict, clicked, matched, buttonlist
+	if buttonlist[number] not in temp_list and len(temp_list) < 2:
 		buttonlist[number].config(bg = colours[number], state = 'disabled')
-		# Add number to answer list
-		answer_list.append(number)
-		# Add button and number to Answer Dictionary
-		answer_dict[b] = colours[number]
-		# Increment our Counter
-		count += 1
+		# Add number to temp list
+		temp_list.append(number)
+		# Add button and number to temp Dictionary
+		temp_dict[b] = colours[number]
 		# Increment our Total Clicks
 		clicked += 1
 		#Update total clicks
 		l1["text"] = 'Clicks: ' + str(clicked)
 	
 	# Check if match or not
-	if len(answer_list) == 2:
-		if colours[answer_list[0]] == colours[answer_list[1]]:
-			for key in answer_dict:
+	if len(temp_list) == 2:
+		if colours[temp_list[0]] == colours[temp_list[1]]:
+			for key in temp_dict:
 				#Disabling the currently selected button
 				key["state"] = "disabled"
 			# Increment our matched counter
@@ -82,11 +84,10 @@ def onClick(b, number):
 				won()
 		else:
 			# Reset the buttons because match not found
-			for key in answer_dict:
+			for key in temp_dict:
 				key.config(bg = 'white', state = 'normal')
-		count = 0
-		answer_list = []
-		answer_dict = {}
+		temp_list = []
+		temp_dict = {}
 
 # Initializing the top frame
 top_frame = Frame(master, width=1500, height= 200, bg='grey')
