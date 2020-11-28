@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import random
 from functools import partial
+from time import sleep
 
 master = Tk()
 master.title('Image Processor')
@@ -61,7 +62,7 @@ def won():
 # Function for clicking buttons
 def onClick(b, number):
 	global temp_list, temp_dict, clicked, matched, buttonlist
-	if buttonlist[number] not in temp_list and len(temp_list) < 2:
+	if len(temp_list) < 2:
 		buttonlist[number].config(bg = colours[number], state = 'disabled')
 		# Add number to temp list
 		temp_list.append(number)
@@ -71,8 +72,13 @@ def onClick(b, number):
 		clicked += 1
 		#Update total clicks
 		l1["text"] = 'Clicks: ' + str(clicked)
+		# Refresh GUI
+		master.update()
+		master.after(1000,check_if_match)
 	
-	# Check if match or not
+
+def check_if_match():
+	global temp_list, temp_dict, clicked, matched, buttonlist
 	if len(temp_list) == 2:
 		if colours[temp_list[0]] == colours[temp_list[1]]:
 			for key in temp_dict:
@@ -80,7 +86,7 @@ def onClick(b, number):
 				key["state"] = "disabled"
 			# Increment our matched counter
 			matched += 1
-			if matched == 12:
+			if matched == len(buttonlist)//2:
 				won()
 		else:
 			# Reset the buttons because match not found
